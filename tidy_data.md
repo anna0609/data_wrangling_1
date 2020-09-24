@@ -54,3 +54,60 @@ pulse_data =
   relocate(id, visit) %>% 
   mutate(visit = recode(visit,"bl"="00m"))
 ```
+
+## `pivot wider`
+
+Make up some data\!
+
+``` r
+analysis_result = 
+tibble(
+  group = c("treatement", "treatement", "placebo", "placebo"),
+  time = c("pre", "post", "pre", "post"),
+  mean = c(4,8,3.5,4)
+)
+
+analysis_result %>% 
+  pivot_wider(
+    names_from = "time",
+    values_from = "mean"
+  )
+```
+
+    ## # A tibble: 2 x 3
+    ##   group        pre  post
+    ##   <chr>      <dbl> <dbl>
+    ## 1 treatement   4       8
+    ## 2 placebo      3.5     4
+
+## Binding rows
+
+Using the LotR data. First step: import each table.
+
+``` r
+fellowship_ring =
+  readxl::read_excel("./data/LotR_words.xlsx", range= "B3:D6") %>% 
+  mutate(movie = "fellowship_ring")
+
+two_towers =
+  readxl::read_excel("./data/LotR_words.xlsx", range= "F3:H6") %>% 
+  mutate(movie = "two_towers")
+
+return_king =
+  readxl::read_excel("./data/LotR_words.xlsx", range= "J3:L6") %>% 
+  mutate(movie = "return_king")
+```
+
+bind all the rows together
+
+``` r
+lotr_tidy =
+  bind_rows(fellowship_ring, two_towers, return_king) %>% 
+  janitor::clean_names() %>% 
+  relocate(movie) %>% 
+pivot_longer(
+  female:male,
+  names_to = "gender",
+  values_to = "words"
+)
+```
